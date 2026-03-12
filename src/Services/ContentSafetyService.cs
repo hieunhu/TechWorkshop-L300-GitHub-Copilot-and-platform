@@ -20,7 +20,11 @@ public class ContentSafetyService
     public ContentSafetyService(IConfiguration config, ILogger<ContentSafetyService> logger)
     {
         var endpoint = config["AIServices:Endpoint"]!;
-        _client = new ContentSafetyClient(new Uri(endpoint), new DefaultAzureCredential());
+        var clientId = config["AIServices:ManagedIdentityClientId"];
+        var credential = clientId != null
+            ? new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = clientId })
+            : new DefaultAzureCredential();
+        _client = new ContentSafetyClient(new Uri(endpoint), credential);
         _logger = logger;
     }
 
