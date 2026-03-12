@@ -42,7 +42,11 @@ public class ChatController : Controller
             var endpoint = _config["AIServices:Endpoint"]!;
             var deployment = _config["AIServices:DeploymentName"]!;
 
-            var client = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+            var clientId = _config["AIServices:ManagedIdentityClientId"];
+            var credential = clientId != null
+                ? new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = clientId })
+                : new DefaultAzureCredential();
+            var client = new AzureOpenAIClient(new Uri(endpoint), credential);
             var chatClient = client.GetChatClient(deployment);
 
             var result = await chatClient.CompleteChatAsync(
