@@ -33,6 +33,9 @@ public class ChatController : Controller
         {
             _logger.LogWarning("ContentSafety | Prompt blocked. Category={Category} Severity={Severity}",
                 safetyResult.BlockedCategory, safetyResult.MaxSeverity);
+            _logger.LogInformation("Chat | User={User} Message={Message} Reply={Reply} Blocked={Blocked}",
+                HttpContext.Connection.RemoteIpAddress, message,
+                $"Blocked: {safetyResult.BlockedCategory}", true);
             return Json(new { reply = $"⚠️ Your message was blocked due to unsafe content ({safetyResult.BlockedCategory}). Please rephrase." });
         }
 
@@ -54,7 +57,10 @@ public class ChatController : Controller
                 new UserChatMessage(message)
             );
 
-            return Json(new { reply = result.Value.Content[0].Text });
+            var reply = result.Value.Content[0].Text;
+            _logger.LogInformation("Chat | Message={Message} Reply={Reply} Blocked={Blocked}", message, reply, false);
+
+            return Json(new { reply });
         }
         catch (Exception ex)
         {
