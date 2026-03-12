@@ -3,6 +3,7 @@ using ZavaStorefront.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddControllersWithViews();
 
 // Add session support
